@@ -2556,6 +2556,7 @@ void setCfgNRst_TX2_4GB(const ProductPortFolio folio, Items *items, TestConfigs 
 	char tmp_file_name[] = "100M.dd";
 	char rs232_dev_path[] = "/dev/ttyTHS2";
 	char uart_dev_path[] = "/dev/ttyS0";
+	char uart_csi_dev_path[] = "/dev/ttyTHS1";
 	char serial_test_data[] = "Aetina";
 	int gpio[5] = {488, 388, 389, 481, 397};
 	char spi_dev_path[] = "/dev/spidev3.0";
@@ -2638,6 +2639,12 @@ void setCfgNRst_TX2_4GB(const ProductPortFolio folio, Items *items, TestConfigs 
 			configs->pCfg_UART->pszTestingData = malloc(strlen(serial_test_data)*sizeof(char));
 			memcpy(configs->pCfg_UART->pszTestingData, serial_test_data, strlen(serial_test_data)+1);
 			break;
+                case UART_CSI:
+			configs->pCfg_UART_CSI->pszDeviceName = malloc(strlen(uart_csi_dev_path)*sizeof(char));
+			memcpy(configs->pCfg_UART_CSI->pszDeviceName, uart_csi_dev_path, strlen(uart_csi_dev_path)+1);
+			configs->pCfg_UART_CSI->pszTestingData = malloc(strlen(serial_test_data)*sizeof(char));
+			memcpy(configs->pCfg_UART_CSI->pszTestingData, serial_test_data, strlen(serial_test_data)+1);
+			break;
 		case GPIO:
 			configs->pCfg_GPIO->nGPIO_Pins_Number = sizeof(gpio)/sizeof(int);
 			configs->pCfg_GPIO->pGPIO_Pins = realloc(configs->pCfg_GPIO->pGPIO_Pins, sizeof(gpio));
@@ -2664,6 +2671,11 @@ void setCfgNRst_TX2_4GB(const ProductPortFolio folio, Items *items, TestConfigs 
 			configs->pCfg_I2C->nAddress = 0x50;
 			configs->pCfg_I2C->nData = 0xa5;
 			break;
+                case I2C_CSI:
+			configs->pCfg_I2C_CSI->nI2C_ID = 1;
+			configs->pCfg_I2C_CSI->nAddress = 0x50;
+			configs->pCfg_I2C_CSI->nData = 0xa5;
+			break;	
 		case SPI:
 			configs->pCfg_SPI->pszDeviceName = malloc(strlen(spi_dev_path)*sizeof(char));
 			strcpy(configs->pCfg_SPI->pszDeviceName, spi_dev_path);

@@ -44,11 +44,18 @@ int configure_serial_port(int fd){
 int serial_test(char *pszDevName, char *data){
   char buffer[255];
   char *pbuffer;
+  char szCMD[255] = {0};
   int nbytes;
   int result = -1;
   memset(buffer, 0, sizeof(buffer));
 
   int fd = open (pszDevName, O_RDWR | O_NOCTTY | O_NDELAY);
+  sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xfb");
+	/*if(SystemCMD(szCMD) < 0){
+		printf("poweron-failed\n");}
+	else{ 
+		printf("poweron\n");}*/
+  printf("pszDevName:%s\n",pszDevName);
   if (fd < 0)
   {
   #ifdef _DEBUG_
@@ -59,8 +66,11 @@ int serial_test(char *pszDevName, char *data){
   else{
     fcntl(fd, F_SETFL, 0);
   }
+  printf("fd:%d\n",fd);
+  printf("configure_serial_port(fd):%d\n",configure_serial_port(fd));
 
   if (configure_serial_port(fd) < 0){
+    printf("error");
     return -1;
   }
 
@@ -71,19 +81,35 @@ int serial_test(char *pszDevName, char *data){
   timeout.tv_sec = 1;
   timeout.tv_usec = 0;
 
-  for(int count=0;count<3;count++){
-    if (write(fd, "Aetina\r",7) < 7)
+  for(int count=0;count<3;count++){ 
+    printf("count:%d\n",count);
+    int debug;
+    int debug2;
+    debug = write(fd, "Aetina\r",7);
+    printf("debug:%d\n",debug);
+    if (debug < 7)
       continue;
-
+    //if (write(fd, "Aetina\r",7) < 7)
+      //continue;
+    printf("select...\n");
+    debug2 = select(fd+1, &read_fds, NULL, NULL, &timeout);
+    printf("select-debug:%d\n",debug2);
     if (select(fd+1, &read_fds, NULL, NULL, &timeout) > 0){
+      printf("select is true.");
       pbuffer = buffer;
+      printf("buffer:%s\n",pbuffer);
       while((nbytes = read(fd, pbuffer, buffer+sizeof(buffer)-pbuffer-1))>0){
         pbuffer += nbytes;
         if (pbuffer[-1] == '\n' || pbuffer[-1] == '\r'){
           break;
         }
       }
-
+     sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xf9");
+      if(SystemCMD(szCMD) < 0){
+		printf("power off Failed\n");}
+      else{ 
+		printf("poweroff\n");
+	}
       *pbuffer = '\0';
       if (strncmp(buffer, "Aetina", 6) == 0){
       #ifdef _DEBUG_
@@ -92,7 +118,8 @@ int serial_test(char *pszDevName, char *data){
         result = 0;
         break;
       }
-    }    
+    } 
+printf("select...done\n");   
   }
 
   close(fd);
