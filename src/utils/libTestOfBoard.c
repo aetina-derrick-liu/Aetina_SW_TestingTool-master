@@ -1103,8 +1103,9 @@ int TOB_I2C_Testing(I2C_CFG *i2c_cfg, I2C_RESULT *i2c_result){
 
 	char szResult[5] = {0}, szCMD[MAX_CMD] = {0}, szTemp[MAX_PATH] = {0};
 	bool bNoDevice = false;
-
+	
 	sprintf(szCMD, "i2cdump -f -y %d 0x%02x", i2c_cfg->nI2C_ID, i2c_cfg->nAddress);
+
 	FILE *fp = popen(szCMD, "r");
 	if(fp){
 		while(fgets(szTemp, MAX_PATH, fp)){
@@ -1148,7 +1149,7 @@ int TOB_I2C_II_Testing(I2C_II_CFG *i2c_II_cfg, I2C_II_RESULT *i2c_II_result){
 
 	char szResult[5] = {0}, szCMD[MAX_CMD] = {0}, szTemp[MAX_PATH] = {0};
 	bool bNoDevice = false;
-
+	
 	sprintf(szCMD, "i2cdump -f -y %d 0x%02x", i2c_II_cfg->nI2C_ID, i2c_II_cfg->nAddress);
 	FILE *fp = popen(szCMD, "r");
 	if(fp){
@@ -1193,13 +1194,24 @@ int TOB_I2C_CSI_Testing(I2C_CSI_CFG *i2c_CSI_cfg, I2C_CSI_RESULT *i2c_CSI_result
 
 	char szResult[5] = {0}, szCMD[MAX_CMD] = {0}, szTemp[MAX_PATH] = {0};
 	bool bNoDevice = false;
-
+       	
+	sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xfb");
+	if(SystemCMD(szCMD) < 0){
+		printf("poweron-failed\n");}
+	else{ 
+		printf("poweron\n");}
+	
 	sprintf(szCMD, "i2cdump -f -y %d 0x%02x", i2c_CSI_cfg->nI2C_ID, i2c_CSI_cfg->nAddress);
+        //printf("I2C_ID:%d\n",i2c_CSI_cfg->nI2C_ID);
+        //printf("nAddress:%d\n",i2c_CSI_cfg->nAddress);
+        //printf("szCMD:=======%s\n", szCMD);
 	FILE *fp = popen(szCMD, "r");
 	if(fp){
+		printf("fp is true\n");
 		while(fgets(szTemp, MAX_PATH, fp)){
 			if(strstr(szTemp, "00:") && strstr(szTemp, "XX")){
 				bNoDevice = true;
+				printf("bNodevice=true\n");
 				break;
 			}
 		}
@@ -1213,9 +1225,9 @@ int TOB_I2C_CSI_Testing(I2C_CSI_CFG *i2c_CSI_cfg, I2C_CSI_RESULT *i2c_CSI_result
 	
 	sleep(1);
 	sprintf(szCMD, "i2cset -f -y %d 0x%02x 0x00 0xff", i2c_CSI_cfg->nI2C_ID, i2c_CSI_cfg->nAddress);
-	if(SystemCMD(szCMD) < 0)
+	if(SystemCMD(szCMD) < 0){
 		return FAILED;
-
+	};
 	sleep(1);
 	memset(szCMD, 0, MAX_CMD);
 	sprintf(szCMD, "i2cset -f -y %d 0x%02x 0x00 0x%02x", i2c_CSI_cfg->nI2C_ID, i2c_CSI_cfg->nAddress, i2c_CSI_cfg->nData);
@@ -1228,10 +1240,18 @@ int TOB_I2C_CSI_Testing(I2C_CSI_CFG *i2c_CSI_cfg, I2C_CSI_RESULT *i2c_CSI_result
 	fp = popen(szCMD, "r");
 	fgets(szResult, 5, fp);
 	pclose(fp);
-
+	sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xf9");
+	if(SystemCMD(szCMD) < 0){
+		printf("power off Failed\n");}
+	else{ 
+		printf("poweroff\n");
+	}
 	sprintf(szCMD, "szResult : %s, szResult : 0x%02x, i2c_CSI_cfg->nData : 0x%02x", szResult, strtol(szResult, NULL, 16), i2c_CSI_cfg->nData);
+       
 	
 	return strtol(szResult, NULL, 16) == i2c_CSI_cfg->nData ? OK : FAILED;
+	
+	
 }
 
 int TOB_SPI_testing(SPI_CFG *spi_cfg, SPI_RESULT *spi_result){
