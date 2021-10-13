@@ -3539,9 +3539,9 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 	char tmp_path[] = "/mnt";
 	char tmp_file_name[] = "100M.dd";
 	char rs232_dev_path[] = "/dev/ttyTHS1";
-	char uart_dev_path[] = "/dev/ttyTHS0";
+	char uart_dev_path[] = "/dev/ttyTHS2";
 	char serial_test_data[] = "Aetina";
-	char spi_dev_path[] = "/dev/spidev2.0";
+	char spi_dev_path[] = "/dev/spidev1.0";
 	char ekey_keyword[] = "Intel";
 	char bkey_keyword[] = "Telit";
 	int gpio[] = {421, 422, 445, 268, 393};
@@ -3716,6 +3716,9 @@ void configureTestCore(TestCore *core, TestMode mode){
 	if (strstr(module, "TX2")){
 		if (strstr(module, "TX2_NX")){
 			if (strstr(dts, "CT41_1")){
+				setCfgNRst_TX2_NX(AT017, core->pTestItems, core->pTestConfigs, core->pTestResults);
+			}
+			else{
 				setCfgNRst_TX2_NX(AT017, core->pTestItems, core->pTestConfigs, core->pTestResults);
 			}
 		}

@@ -204,7 +204,7 @@ int doTest_UART(UART_CFG *uart_cfg, UART_RESULT *uart_result){
 	char szMsg[MAX_PATH] = {0};
 
 	int nResult = TOB_UART_Testing(uart_cfg, uart_result);
-	printf("nResult:%d\n",nResult);
+	//printf("nResult:%d\n",nResult);
 	if(nResult != NOT_FOUND_DEVICE){
 		if (nResult == OK){
 			uart_result->nResult = OK;
@@ -396,7 +396,6 @@ int doTest_I2C_CSI(I2C_CSI_CFG *i2c_CSI_cfg, I2C_CSI_RESULT *i2c_CSI_result){
 	char szMsg[MAX_PATH] = {0};
 
 	int nResult = TOB_I2C_CSI_Testing(i2c_CSI_cfg, i2c_CSI_result);
-        printf("nResult:%d\n",nResult);
 	if( nResult != OK){
 		i2c_CSI_result->nResult = FAILED;
 		logFAILED("I2C CSI: FAILED\n");

@@ -592,6 +592,11 @@ int TOB_MSATA_testing(MSATA_CFG *msata_cfg, MSATA_RESULT *msata_result){
 								// nPortPosition = strstr(szResult, usb_cfg->pUSB_3_0_TYPE_A_UP_USB3DEV) ? UP : DOWN;
 								bFind = true;
 							}
+							else if(strstr(szResult, "usb2/2-2/2-2.1/2-2.1")){
+								nType = USB_3_0;									
+								// nPortPosition = strstr(szResult, usb_cfg->pUSB_3_0_TYPE_A_UP_USB3DEV) ? UP : DOWN;
+								bFind = true;
+						        }
 						}
 						pclose(fp);
 					}
@@ -1207,11 +1212,11 @@ int TOB_I2C_CSI_Testing(I2C_CSI_CFG *i2c_CSI_cfg, I2C_CSI_RESULT *i2c_CSI_result
         //printf("szCMD:=======%s\n", szCMD);
 	FILE *fp = popen(szCMD, "r");
 	if(fp){
-		printf("fp is true\n");
+		//printf("fp is true\n");
 		while(fgets(szTemp, MAX_PATH, fp)){
 			if(strstr(szTemp, "00:") && strstr(szTemp, "XX")){
 				bNoDevice = true;
-				printf("bNodevice=true\n");
+				//printf("bNodevice=true\n");
 				break;
 			}
 		}
