@@ -51,10 +51,10 @@ int serial_test(char *pszDevName, char *data){
 
   int fd = open (pszDevName, O_RDWR | O_NOCTTY | O_NDELAY);
   sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xfb");
-	/*if(SystemCMD(szCMD) < 0){
+	if(SystemCMD(szCMD) < 0){
 		printf("poweron-failed\n");}
 	else{ 
-		printf("poweron\n");}*/
+		printf("poweron\n");}
   printf("pszDevName:%s\n",pszDevName);
   if (fd < 0)
   {
