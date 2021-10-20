@@ -3547,7 +3547,7 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 	int gpio[] = {421, 422, 445, 268, 393};
 	// int gpio_AT017[] =  {421, 422, 445, 268, 393, 491, 492, 493, 495};
 	// 0907 from Chris 應該要有9個 目前只有8個
-	int gpio_AT017[] =  {425, 306, 338, 269, 376, 377, 378, 392};
+	int gpio_AT017[] =  {425, 306, 338, 269, 376, 377, 378, 483};
 
  	char usb_3_type_a_up_usb3_dev[] = "usb2/2-3/2-3.1";
   	char usb_3_type_a_up_usb2_dev[] = "usb1/1-2/1-2.1";
