@@ -566,11 +566,13 @@ int TOB_MSATA_testing(MSATA_CFG *msata_cfg, MSATA_RESULT *msata_result){
 	unsigned long long ms_end_time = 0;
 	FILE *fp = NULL;
 	switch(GetDts()){
+		
 		case AT017:{
 			FILE *pFile = popen("blkid", "r");
 			while(fgets(szCMD, MAX_CMD, pFile)){
 				if(!strstr(szCMD, "mmcblk") && !strstr(szCMD, "/dev/loop") && (strstr(szCMD, "fat") || strstr(szCMD, "ext") || strstr(szCMD, "ntfs"))){
-					char szPath[MAX_PATH] = {0};
+					//char szPath[MAX_PATH] = {0};
+					memset(szPath, 0, MAX_PATH);
 					strncpy(szPath, szCMD, strlen(szCMD) - strlen(strstr(szCMD, ":")));
 					if(szPath){
 						char szResult[MAX_PATH] = {0};
@@ -587,16 +589,16 @@ int TOB_MSATA_testing(MSATA_CFG *msata_cfg, MSATA_RESULT *msata_result){
 								// nPortPosition = strstr(szResult, usb_cfg->pUSB_3_0_TYPE_A_UP_USB3DEV) ? UP : DOWN;
 								bFind = true;
 							}
-							else if(strstr(szResult, "usb2/2-1")){
+							else if(strstr(szResult, "usb2/2-1/2-1.1")){
 								nType = USB_3_0;									
 								// nPortPosition = strstr(szResult, usb_cfg->pUSB_3_0_TYPE_A_UP_USB3DEV) ? UP : DOWN;
 								bFind = true;
 							}
-							else if(strstr(szResult, "usb2/2-2/2-2.1/2-2.1")){
-								nType = USB_3_0;									
+							//else if(strstr(szResult, "usb2/2-2/2-2.1/2-2.1")){
+								//nType = USB_3_0;									
 								// nPortPosition = strstr(szResult, usb_cfg->pUSB_3_0_TYPE_A_UP_USB3DEV) ? UP : DOWN;
-								bFind = true;
-						        }
+								//bFind = true;
+						        //}
 						}
 						pclose(fp);
 					}
@@ -605,7 +607,8 @@ int TOB_MSATA_testing(MSATA_CFG *msata_cfg, MSATA_RESULT *msata_result){
 			pclose(pFile);
 			if(!bFind)
 				return NOT_FOUND_DEVICE;
-			sprintf(szCMD, "mount %s %s", "/dev/sdb1", "/mnt");
+			sprintf(szCMD, "mount %s %s", szPath, "/mnt");
+			//printf(szCMD);
 			SystemCMD(szCMD);
 
 			gettimeofday(&start_time, NULL);
@@ -629,12 +632,13 @@ int TOB_MSATA_testing(MSATA_CFG *msata_cfg, MSATA_RESULT *msata_result){
 
 			return OK;
 		}				
-
+		
 		default:{
 			fp = popen("blkid | grep -v \"mmcblk\"", "r");
 			while (fgets(szCMD, MAX_CMD, fp) != NULL){
 				splitDisk(szCMD, szPath);
 				if(szPath){
+					//printf("szpath:%s\n",szPath);
 					sprintf(szCMD, "udevadm info --query=path --name=%s", szPath);
 					FILE *pFile = popen(szCMD, "r");
 					while(fgets(szCMD, MAX_CMD, pFile) != NULL){
