@@ -3361,7 +3361,7 @@ void setCfgNRst_Nano(const ProductPortFolio folio, Items *items, TestConfigs *co
 	char rs232_dev_path[] = "/dev/ttyTHS2";
 	char uart_dev_path[] = "/dev/ttyTHS1";
 	char serial_test_data[] = "Aetina";
-	char spi_dev_path[] = "/dev/spidev1.0";
+	char spi_dev_path[] = "/dev/spidev0.0";
 	char ekey_keyword[] = "Intel";
 	int gpio[] = {149, 79, 200, 194, 38};
 	int gpio_AT017[] =  {149, 200,79, 194, 38,16,17,18,20};
