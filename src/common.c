@@ -3548,6 +3548,7 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 	// int gpio_AT017[] =  {421, 422, 445, 268, 393, 491, 492, 493, 495};
 	// 0907 from Chris 應該要有9個 目前只有8個
 	int gpio_AT017[] =  {425, 306, 338, 269, 376, 377, 378, 483};
+	int gpio_AN110[] =  {425, 306, 338, 269, 392};
 
  	char usb_3_type_a_up_usb3_dev[] = "usb2/2-3/2-3.1";
   	char usb_3_type_a_up_usb2_dev[] = "usb1/1-2/1-2.1";
@@ -3564,6 +3565,15 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 
 		sprintf(usb_3_type_a_down_usb3_dev, "usb2/2-2/2-2.2");
 		sprintf(usb_3_type_a_donw_usb2_dev, "usb1/1-2/1-2.2");
+	}
+
+	else if (folio == AN110){
+		// 使用 udevadm monitor --kernel --property --subsystem-match=usb 進行監控
+		sprintf(usb_3_type_a_up_usb3_dev,   "usb2/2-2/2-2.2");
+		sprintf(usb_3_type_a_up_usb2_dev,   "usb1/1-2/1-2.2");
+
+		sprintf(usb_3_type_a_down_usb3_dev, "usb2/2-2/2-2.1");
+		sprintf(usb_3_type_a_donw_usb2_dev, "usb1/1-2/1-2.1");
 	}
 	// 各項目進行測試
 	Items *pItem = items;
@@ -3599,6 +3609,14 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 				results->pResult_GPIO->nPinResults = realloc(results->pResult_GPIO->nPinResults, sizeof(gpio_AT017));
 				memset(results->pResult_GPIO->nPinResults, 0, sizeof(gpio_AT017));
 			}
+			else if (folio == AN110){
+				configs->pCfg_GPIO->nGPIO_Pins_Number = sizeof(gpio_AN110)/sizeof(int);
+				results->pResult_GPIO->nPinCount = 5;
+				configs->pCfg_GPIO->pGPIO_Pins = realloc(configs->pCfg_GPIO->pGPIO_Pins, sizeof(gpio_AN110));
+				memcpy(configs->pCfg_GPIO->pGPIO_Pins, gpio_AN110, sizeof(gpio_AN110));
+				results->pResult_GPIO->nPinResults = realloc(results->pResult_GPIO->nPinResults, sizeof(gpio_AN110));
+				memset(results->pResult_GPIO->nPinResults, 0, sizeof(gpio_AN110));
+			}
 			else{
 				configs->pCfg_GPIO->nGPIO_Pins_Number = sizeof(gpio)/sizeof(int);
 				results->pResult_GPIO->nPinCount = 5;
@@ -3609,8 +3627,15 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 			}
 			break;
 		case FAN:
-			configs->pCfg_FAN->nFAN_Number = 448;
-			configs->pCfg_FAN->nValue = 255;
+			if(folio == AN110){
+				configs->pCfg_FAN->nFAN_Number = 395;
+				configs->pCfg_FAN->nValue = 255;			
+			}
+			else{
+				configs->pCfg_FAN->nFAN_Number = 448;
+				configs->pCfg_FAN->nValue = 255;
+			}
+
 			break;		
 		case I2C:
 			configs->pCfg_I2C->nI2C_ID = 0;
@@ -3649,6 +3674,9 @@ void setCfgNRst_TX2_NX(const ProductPortFolio folio, Items *items, TestConfigs *
 			memcpy(configs->pCfg_SDCard->pszTmp_file, tmp_file_name, strlen(tmp_file_name)+1);
 			break;			
 		case Camera:
+			break;
+		case eDP:
+			configs->pCfg_eDP->nEDP_Number = 393;
 			break;
 		default:
 			break;
@@ -3717,6 +3745,9 @@ void configureTestCore(TestCore *core, TestMode mode){
 		if (strstr(module, "TX2_NX")){
 			if (strstr(dts, "CT41_1")){
 				setCfgNRst_TX2_NX(AT017, core->pTestItems, core->pTestConfigs, core->pTestResults);
+			}
+			else if (strstr(dts, "AN110")){
+				setCfgNRst_TX2_NX(AN110, core->pTestItems, core->pTestConfigs, core->pTestResults);
 			}
 			else{
 				setCfgNRst_TX2_NX(AT017, core->pTestItems, core->pTestConfigs, core->pTestResults);

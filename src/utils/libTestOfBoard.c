@@ -825,7 +825,7 @@ int TOB_UART2_Testing(UART2_CFG *uart2_cfg, UART2_RESULT *uart2_result){
 }
 
 int TOB_UART_CSI_Testing(UART_CSI_CFG *uart_CSI_cfg, UART_CSI_RESULT *uart_CSI_result){
-	return serial_test(uart_CSI_cfg->pszDeviceName, uart_CSI_cfg->pszTestingData);
+	return serial_test_for_CSI(uart_CSI_cfg->pszDeviceName, uart_CSI_cfg->pszTestingData);
 }
 
 int	TOB_FAN_Testing(FAN_CFG *fan_cfg, FAN_RESULT *fan_result){
@@ -891,6 +891,63 @@ int	TOB_FAN_Testing(FAN_CFG *fan_cfg, FAN_RESULT *fan_result){
 				break;
 			}
 
+		case TX2_NX:
+			switch(GetDts()){
+				case AN110:
+
+					printf("Fan Testing...\n\n");
+					
+					/*sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nFAN_Number);
+					SystemCMD(szCMD);*/
+
+					sprintf(szCMD, "echo %d > /sys/class/gpio/export", nFAN_Number);
+					SystemCMD(szCMD);
+
+					memset(szCMD, 0, sizeof(char) * MAX_PATH);
+					sprintf(szCMD, "echo \"out\" > /sys/class/gpio/gpio%d/direction", nFAN_Number);
+					SystemCMD(szCMD);
+
+					memset(szCMD, 0, sizeof(char) * MAX_PATH);
+					sprintf(szCMD, "echo 0 > /sys/class/gpio/gpio%d/value", nFAN_Number);
+					SystemCMD(szCMD);
+
+					memset(szCMD, 0, sizeof(char) * MAX_PATH);
+					sprintf(szCMD, "cat /sys/class/gpio/gpio%d/value", nFAN_Number);
+					memset(szResult, 0, sizeof(char) * 10);
+					fp = popen(szCMD, "r");
+					fgets(szResult, 10, fp);
+					pclose(fp);
+					if(atoi(szResult) != 0){
+						memset(szCMD, 0, sizeof(char) * MAX_PATH);
+						sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nFAN_Number);
+						SystemCMD(szCMD);
+						return FAILED;
+					}
+
+					sleep(3);
+
+					memset(szCMD, 0, sizeof(char) * MAX_PATH);
+					sprintf(szCMD, "echo \"out\" > /sys/class/gpio/gpio%d/direction", nFAN_Number);
+					SystemCMD(szCMD);
+
+					memset(szCMD, 0, sizeof(char) * MAX_PATH);
+					sprintf(szCMD, "echo 1 > /sys/class/gpio/gpio%d/value", nFAN_Number);
+					SystemCMD(szCMD);
+
+					memset(szCMD, 0, sizeof(char) * MAX_PATH);
+					sprintf(szCMD, "cat /sys/class/gpio/gpio%d/value", nFAN_Number);		
+					fp = popen(szCMD, "r");
+					fgets(szResult, 5, fp);
+					pclose(fp);
+					if(atoi(szResult) != 1){
+						memset(szCMD, 0, sizeof(char) * MAX_PATH);
+						sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nFAN_Number);
+						SystemCMD(szCMD);
+						return FAILED;
+					};		
+					return OK;		
+				break;
+			}
 		default:
 
 		sprintf(szPath, "/sys/devices/pwm-fan/target_pwm");
@@ -942,30 +999,16 @@ int	TOB_EDP_Testing(EDP_CFG *eDP_cfg, EDP_RESULT *eDP_result){
 	int nEDP_Number = eDP_cfg->nEDP_Number;
 	
 	switch(GetModuleType()){
-		case XAVIER_NX:
+		case XAVIER_NX: case TX2_NX:
+
+			memset(szCMD, 0, sizeof(char) * MAX_PATH);
+			sprintf(szCMD, "echo %d > /sys/class/gpio/export", nEDP_Number);
+			SystemCMD(szCMD);
 
 			memset(szCMD, 0, sizeof(char) * MAX_PATH);
 			sprintf(szCMD, "echo \"out\" > /sys/class/gpio/gpio%d/direction", nEDP_Number);
 			SystemCMD(szCMD);
-
-			memset(szCMD, 0, sizeof(char) * MAX_PATH);
-			sprintf(szCMD, "echo 1 > /sys/class/gpio/gpio%d/value", nEDP_Number);
-			SystemCMD(szCMD);
-
-			memset(szCMD, 0, sizeof(char) * MAX_PATH);
-			sprintf(szCMD, "cat /sys/class/gpio/gpio%d/value", nEDP_Number);		
-			fp = popen(szCMD, "r");
-			fgets(szResult, 5, fp);
-			pclose(fp);
-			if(atoi(szResult) != 1){
-				memset(szCMD, 0, sizeof(char) * MAX_PATH);
-				sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nEDP_Number);
-				SystemCMD(szCMD);
-				return FAILED;
-			}
-
-			sleep(3);
-
+						
 			memset(szCMD, 0, sizeof(char) * MAX_PATH);
 			sprintf(szCMD, "echo 0 > /sys/class/gpio/gpio%d/value", nEDP_Number);
 			SystemCMD(szCMD);
@@ -983,9 +1026,25 @@ int	TOB_EDP_Testing(EDP_CFG *eDP_cfg, EDP_RESULT *eDP_result){
 				return FAILED;
 			}
 
+			sleep(20);
+
+
+
 			memset(szCMD, 0, sizeof(char) * MAX_PATH);
-			sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nEDP_Number);		
+			sprintf(szCMD, "echo 0 > /sys/class/gpio/gpio%d/value", nEDP_Number);
 			SystemCMD(szCMD);
+
+			memset(szCMD, 0, sizeof(char) * MAX_PATH);
+			sprintf(szCMD, "cat /sys/class/gpio/gpio%d/value", nEDP_Number);		
+			fp = popen(szCMD, "r");
+			fgets(szResult, 5, fp);
+			pclose(fp);
+			if(atoi(szResult) != 0){
+				memset(szCMD, 0, sizeof(char) * MAX_PATH);
+				sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nEDP_Number);
+				SystemCMD(szCMD);
+				return FAILED;
+			}
 		
 			return OK;
 		break;
@@ -993,24 +1052,6 @@ int	TOB_EDP_Testing(EDP_CFG *eDP_cfg, EDP_RESULT *eDP_result){
 		case NANO:
 
 			sprintf(szPath, "/sys/devices/pwm-fan/target_pwm");
-
-			sprintf(szCMD, "echo %d > %s", eDP_cfg->nValue, szPath);
-			SystemCMD(szCMD);
-
-			memset(szCMD, 0, sizeof(char) * MAX_PATH);
-			sprintf(szCMD, "cat %s", szPath);
-			memset(szResult, 0, sizeof(char) * 10);
-			fp = popen(szCMD, "r");
-			fgets(szResult, 10, fp);
-			pclose(fp);
-			if(atoi(szResult) != eDP_cfg->nValue){
-				memset(szCMD, 0, sizeof(char) * MAX_PATH);
-				sprintf(szCMD, "echo 0 > %s", szPath);
-				SystemCMD(szCMD);
-				return FAILED;
-			}
-			
-			sleep(5);
 
 			sprintf(szCMD, "echo 0 > %s", szPath);
 			SystemCMD(szCMD);
@@ -1027,7 +1068,25 @@ int	TOB_EDP_Testing(EDP_CFG *eDP_cfg, EDP_RESULT *eDP_result){
 				SystemCMD(szCMD);
 				return FAILED;
 			}
+			
+			sleep(20);
 
+
+			sprintf(szCMD, "echo %d > %s", eDP_cfg->nValue, szPath);
+			SystemCMD(szCMD);
+
+			memset(szCMD, 0, sizeof(char) * MAX_PATH);
+			sprintf(szCMD, "cat %s", szPath);
+			memset(szResult, 0, sizeof(char) * 10);
+			fp = popen(szCMD, "r");
+			fgets(szResult, 10, fp);
+			pclose(fp);
+			if(atoi(szResult) != eDP_cfg->nValue){
+				memset(szCMD, 0, sizeof(char) * MAX_PATH);
+				sprintf(szCMD, "echo 0 > %s", szPath);
+				SystemCMD(szCMD);
+				return FAILED;
+			}
 			return OK;
 		break;
 	

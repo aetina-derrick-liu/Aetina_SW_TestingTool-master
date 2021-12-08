@@ -50,6 +50,82 @@ int serial_test(char *pszDevName, char *data){
   memset(buffer, 0, sizeof(buffer));
 
   int fd = open (pszDevName, O_RDWR | O_NOCTTY | O_NDELAY);
+ 
+  printf("pszDevName:%s\n",pszDevName);
+  if (fd < 0)
+  {
+  #ifdef _DEBUG_
+    printf ("open(%s) failed, error(%d) : %s", pszDevName, errno, strerror(errno));
+  #endif
+    return -1;
+  }
+  else{
+    fcntl(fd, F_SETFL, 0);
+  }
+  //printf("fd:%d\n",fd);
+  //printf("configure_serial_port(fd):%d\n",configure_serial_port(fd));
+
+  if (configure_serial_port(fd) < 0){
+    printf("error");
+    return -1;
+  }
+
+  fd_set read_fds;
+  FD_ZERO(&read_fds);
+  FD_SET(fd, &read_fds);
+  struct timeval timeout;
+  timeout.tv_sec = 1;
+  timeout.tv_usec = 0;
+
+  for(int count=0;count<3;count++){ 
+    //printf("count:%d\n",count);
+    int debug;
+    int debug2;
+    debug = write(fd, "Aetina\r",7);
+    //printf("debug:%d\n",debug);
+    if (debug < 7)
+      continue;
+    //if (write(fd, "Aetina\r",7) < 7)
+      //continue;
+    //printf("select...\n");
+    debug2 = select(fd+1, &read_fds, NULL, NULL, &timeout);
+    //printf("select-debug:%d\n",debug2);
+    if (select(fd+1, &read_fds, NULL, NULL, &timeout) > 0){
+      
+      pbuffer = buffer;
+      printf("buffer:%s\n",pbuffer);
+      while((nbytes = read(fd, pbuffer, buffer+sizeof(buffer)-pbuffer-1))>0){
+        pbuffer += nbytes;
+        if (pbuffer[-1] == '\n' || pbuffer[-1] == '\r'){
+          break;
+        }
+      }
+    
+      *pbuffer = '\0';
+      if (strncmp(buffer, "Aetina", 6) == 0){
+      #ifdef _DEBUG_
+        printf("Response:%s\n", buffer);
+      #endif
+        result = 0;
+        break;
+      }
+    } 
+  
+  }
+
+  close(fd);
+  return result;
+}
+
+int serial_test_for_CSI(char *pszDevName, char *data){
+  char buffer[255];
+  char *pbuffer;
+  char szCMD[255] = {0};
+  int nbytes;
+  int result = -1;
+  memset(buffer, 0, sizeof(buffer));
+
+  int fd = open (pszDevName, O_RDWR | O_NOCTTY | O_NDELAY);
   sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xfb");
 	if(SystemCMD(szCMD) < 0){
 		printf("poweron-failed\n");}
@@ -66,8 +142,8 @@ int serial_test(char *pszDevName, char *data){
   else{
     fcntl(fd, F_SETFL, 0);
   }
-  printf("fd:%d\n",fd);
-  printf("configure_serial_port(fd):%d\n",configure_serial_port(fd));
+  //printf("fd:%d\n",fd);
+  //printf("configure_serial_port(fd):%d\n",configure_serial_port(fd));
 
   if (configure_serial_port(fd) < 0){
     printf("error");
@@ -91,9 +167,9 @@ int serial_test(char *pszDevName, char *data){
       continue;
     //if (write(fd, "Aetina\r",7) < 7)
       //continue;
-    printf("select...\n");
+    //printf("select...\n");
     debug2 = select(fd+1, &read_fds, NULL, NULL, &timeout);
-    printf("select-debug:%d\n",debug2);
+    //printf("select-debug:%d\n",debug2);
     if (select(fd+1, &read_fds, NULL, NULL, &timeout) > 0){
       printf("select is true.");
       pbuffer = buffer;
