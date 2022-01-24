@@ -1026,12 +1026,12 @@ int	TOB_EDP_Testing(EDP_CFG *eDP_cfg, EDP_RESULT *eDP_result){
 				return FAILED;
 			}
 
-			sleep(20);
+			sleep(10);
 
 
 
 			memset(szCMD, 0, sizeof(char) * MAX_PATH);
-			sprintf(szCMD, "echo 0 > /sys/class/gpio/gpio%d/value", nEDP_Number);
+			sprintf(szCMD, "echo 1 > /sys/class/gpio/gpio%d/value", nEDP_Number);
 			SystemCMD(szCMD);
 
 			memset(szCMD, 0, sizeof(char) * MAX_PATH);
@@ -1039,7 +1039,7 @@ int	TOB_EDP_Testing(EDP_CFG *eDP_cfg, EDP_RESULT *eDP_result){
 			fp = popen(szCMD, "r");
 			fgets(szResult, 5, fp);
 			pclose(fp);
-			if(atoi(szResult) != 0){
+			if(atoi(szResult) != 1){
 				memset(szCMD, 0, sizeof(char) * MAX_PATH);
 				sprintf(szCMD, "echo %d > /sys/class/gpio/unexport", nEDP_Number);
 				SystemCMD(szCMD);

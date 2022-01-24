@@ -158,11 +158,11 @@ int serial_test_for_CSI(char *pszDevName, char *data){
   timeout.tv_usec = 0;
 
   for(int count=0;count<3;count++){ 
-    printf("count:%d\n",count);
+    //printf("count:%d\n",count);
     int debug;
     int debug2;
     debug = write(fd, "Aetina\r",7);
-    printf("debug:%d\n",debug);
+    //printf("debug:%d\n",debug);
     if (debug < 7)
       continue;
     //if (write(fd, "Aetina\r",7) < 7)
@@ -171,9 +171,9 @@ int serial_test_for_CSI(char *pszDevName, char *data){
     debug2 = select(fd+1, &read_fds, NULL, NULL, &timeout);
     //printf("select-debug:%d\n",debug2);
     if (select(fd+1, &read_fds, NULL, NULL, &timeout) > 0){
-      printf("select is true.");
+      //printf("select is true.");
       pbuffer = buffer;
-      printf("buffer:%s\n",pbuffer);
+      //printf("buffer:%s\n",pbuffer);
       while((nbytes = read(fd, pbuffer, buffer+sizeof(buffer)-pbuffer-1))>0){
         pbuffer += nbytes;
         if (pbuffer[-1] == '\n' || pbuffer[-1] == '\r'){
@@ -181,10 +181,10 @@ int serial_test_for_CSI(char *pszDevName, char *data){
         }
       }
      sprintf(szCMD,"i2cset -f -y 0 0x77 0x3 0xf9");
-      if(SystemCMD(szCMD) < 0){
-		printf("power off Failed\n");}
-      else{ 
-		printf("poweroff\n");
+      //if(SystemCMD(szCMD) < 0){
+		//printf("power off Failed\n");}
+     // else{ 
+		//printf("poweroff\n");
 	}
       *pbuffer = '\0';
       if (strncmp(buffer, "Aetina", 6) == 0){
@@ -195,8 +195,7 @@ int serial_test_for_CSI(char *pszDevName, char *data){
         break;
       }
     } 
-printf("select...done\n");   
-  }
+//printf("select...done\n");   
 
   close(fd);
   return result;

@@ -9,10 +9,10 @@ LOGFILE := TestingTool_Report.txt
 #---------------------------------------------------------------------------------------------
 # Compile Variable
 # 使用gcc 進行編譯
-#CC = gcc
+CC = gcc
 #CC = /opt/linaro/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-gcc
 
-CC =  /home/derrick/14t-gcc/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+#CC =  /home/derrick/14t-gcc/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
 
 # linux ar command 
 # 用來 建立, 修改 函示庫
